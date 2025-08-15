@@ -53,7 +53,7 @@ const Award = ({ className }) => <div className={`w-6 h-6 ${className}`}>🏅</d
 const Star = ({ className }) => <div className={`w-6 h-6 ${className}`}>⭐</div>;
 
 // 🔥🔥🔥 NUCLEAR OPTION - HARDCODED URL 🔥🔥🔥
-const API = 'http://127.0.0.1:8001/api';
+const API = 'http://localhost:8030/api';
 
 // 🚨 AGGRESSIVE DEBUGGING - LINHA 13 🚨
 console.error('🔥🔥🔥 NUCLEAR DEBUG - APP.JS LINHA 13 🔥🔥🔥');
@@ -64,17 +64,18 @@ console.error('🔥 TIMESTAMP:', new Date().toISOString());
 console.error('🔥 LOCATION:', window.location.href);
 
 // 🚨 IMMEDIATE ALERT IF WRONG 🚨
-if (API.includes('8050')) {
-  console.error('💥💥💥 IMPOSSIBLE ERROR: API contains 8050!');
-  alert('💥 IMPOSSIBLE ERROR: API=' + API);
+if (API.includes('8050') || API.includes('8001')) {
+  console.error('💥💥💥 WRONG PORT ERROR: API contains wrong port!');
+  console.error('💥 API should be 8030, but is:', API);
+  alert('💥 WRONG PORT ERROR: API=' + API + ' (should be 8030)');
   debugger; // Force break in debugger
   throw new Error('💥 API URL ERROR: ' + API);
 } else {
-  console.error('✅ SUCCESS: API is 8001');
+  console.error('✅ SUCCESS: API is 8030');
 }
 
 // 🔥 OVERRIDE AXIOS DEFAULTS 🔥
-axios.defaults.baseURL = 'http://127.0.0.1:8001/api';
+axios.defaults.baseURL = 'http://localhost:8030/api';
 console.error('🔥 AXIOS BASE URL SET TO:', axios.defaults.baseURL);
 
 // Auth Context
@@ -915,18 +916,43 @@ const AdminPanel = () => {
     setMessage('');
     
     try {
-      console.error('🔥 ADMIN BOT SUBMIT - API URL:', API);
-      console.error('🔥 ADMIN BOT DATA:', botFormData);
+      console.error('🔥🔥🔥 WINDOWS DEBUG - ADMIN BOT SUBMIT 🔥🔥🔥');
+      console.error('🔥 API URL:', API);
+      console.error('🔥 RAW FORM DATA:', botFormData);
+      
+      // Clean and validate data
+      const cleanData = {
+        username: String(botFormData.username).trim(),
+        email: String(botFormData.email).trim(),
+        bio: String(botFormData.bio || '').trim(),
+        pc_points: parseInt(botFormData.pc_points) || 0,
+        pcon_points: parseInt(botFormData.pcon_points) || 0,
+        rank: String(botFormData.rank || 'Iniciante').trim(),
+        location: String(botFormData.location || '').trim(),
+        skills: Array.isArray(botFormData.skills) ? botFormData.skills : []
+      };
+      
+      console.error('🔥 CLEANED DATA:', cleanData);
+      console.error('🔥 JSON STRINGIFY:', JSON.stringify(cleanData));
       
       const token = localStorage.getItem('token');
-      const response = await axios.post(`${API}/admin/bots/`, botFormData, {
-        headers: { 
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      console.error('🔥 TOKEN:', token ? 'EXISTS' : 'MISSING');
       
-      console.error('🔥 ADMIN BOT SUCCESS:', response.data);
+      const fullUrl = `${API}/admin/bots/`;
+      console.error('🔥 FULL URL:', fullUrl);
+      
+      const headers = { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      };
+      console.error('🔥 HEADERS:', headers);
+      
+      console.error('🔥 MAKING REQUEST...');
+      const response = await axios.post(fullUrl, cleanData, { headers });
+      
+      console.error('🔥 SUCCESS RESPONSE:', response);
+      console.error('🔥 SUCCESS DATA:', response.data);
       setMessage('Bot criado com sucesso!');
       setBotFormData({
         username: '',
@@ -939,9 +965,23 @@ const AdminPanel = () => {
         skills: []
       });
     } catch (error) {
-      console.error('🔥 ADMIN BOT ERROR:', error);
-      console.error('🔥 ERROR RESPONSE:', error.response?.data);
-      setMessage('Erro ao criar bot: ' + (error.response?.data?.detail || error.message));
+      console.error('🔥 ERROR OBJECT:', error);
+      console.error('🔥 ERROR MESSAGE:', error.message);
+      console.error('🔥 ERROR RESPONSE:', error.response);
+      console.error('🔥 ERROR DATA:', error.response?.data);
+      console.error('🔥 ERROR STATUS:', error.response?.status);
+      console.error('🔥 ERROR HEADERS:', error.response?.headers);
+      
+      let errorMsg = 'Erro desconhecido';
+      if (error.response?.data?.detail) {
+        errorMsg = error.response.data.detail;
+      } else if (error.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+      
+      setMessage('Erro ao criar bot: ' + errorMsg);
     } finally {
       setLoading(false);
     }

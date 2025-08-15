@@ -12,25 +12,25 @@
     
     <!-- FORCE CORRECT API URL GLOBALLY - CACHE BUSTER -->
     <script>
-      // 🔥 CACHE BUSTER - TIMESTAMP: 2025-08-15-19:00:00
-      console.error('🔥🔥🔥 CACHE BUSTER LOADED - TIMESTAMP: 2025-08-15-19:00:00 🔥🔥🔥');
+      // 🔥 CACHE BUSTER - TIMESTAMP: 2025-08-15-19:30:00 WINDOWS FIX
+      console.error('🔥🔥🔥 WINDOWS FIX - TIMESTAMP: 2025-08-15-19:30:00 🔥🔥🔥');
       
-      // NUCLEAR OPTION - FORCE URL
-      window.FORCED_API_URL = 'http://127.0.0.1:8001/api';
-      console.error('🔥 NUCLEAR API URL SET TO:', window.FORCED_API_URL);
+      // NUCLEAR OPTION - FORCE URL FOR WINDOWS PORT 8030
+      window.FORCED_API_URL = 'http://localhost:8030/api';
+      console.error('🔥 WINDOWS API URL SET TO:', window.FORCED_API_URL);
       
       // Override React environment
       window.process = window.process || {};
       window.process.env = window.process.env || {};
-      window.process.env.REACT_APP_BACKEND_URL = 'http://127.0.0.1:8001/api';
+      window.process.env.REACT_APP_BACKEND_URL = 'http://localhost:8030/api';
       
-      // IMMEDIATE CHECK
-      if (window.FORCED_API_URL.includes('8050')) {
-        alert('💥 CRITICAL ERROR IN INDEX.HTML: ' + window.FORCED_API_URL);
-        throw new Error('💥 INDEX.HTML API ERROR');
+      // IMMEDIATE CHECK FOR WRONG PORTS
+      if (window.FORCED_API_URL.includes('8050') || window.FORCED_API_URL.includes('8001')) {
+        alert('💥 WRONG PORT IN INDEX.HTML: ' + window.FORCED_API_URL + ' (should be 8030)');
+        throw new Error('💥 INDEX.HTML WRONG PORT ERROR');
       }
       
-      console.error('🔥 INDEX.HTML: API URL IS CORRECT (8001)');
+      console.error('🔥 INDEX.HTML: API URL IS CORRECT (8030)');
     </script>
     
     <title>Acode Lab</title>
