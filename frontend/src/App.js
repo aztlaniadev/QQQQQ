@@ -2,7 +2,81 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
-const API = import.meta.env.REACT_APP_BACKEND_URL || process.env.REACT_APP_BACKEND_URL;
+// UI Components (assumed to be available)
+const Button = ({ children, className = '', variant = 'default', size = 'default', disabled = false, onClick, type = 'button' }) => (
+  <button 
+    type={type}
+    className={`px-4 py-2 rounded font-medium ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+    onClick={onClick}
+    disabled={disabled}
+  >
+    {children}
+  </button>
+);
+
+const Card = ({ children, className = '' }) => (
+  <div className={`rounded-lg border shadow-sm ${className}`}>
+    {children}
+  </div>
+);
+
+const CardHeader = ({ children }) => <div className="flex flex-col space-y-1.5 p-6">{children}</div>;
+const CardTitle = ({ children, className = '' }) => <h3 className={`text-2xl font-semibold leading-none tracking-tight ${className}`}>{children}</h3>;
+const CardContent = ({ children, className = '' }) => <div className={`p-6 pt-0 ${className}`}>{children}</div>;
+
+const Input = ({ className = '', ...props }) => (
+  <input className={`flex h-10 w-full rounded-md border px-3 py-2 text-sm ${className}`} {...props} />
+);
+
+const Label = ({ children, className = '', htmlFor }) => (
+  <label htmlFor={htmlFor} className={`text-sm font-medium leading-none ${className}`}>{children}</label>
+);
+
+const Textarea = ({ className = '', ...props }) => (
+  <textarea className={`flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm ${className}`} {...props} />
+);
+
+// Icons (simplified)
+const MessageSquare = ({ className }) => <div className={`w-6 h-6 ${className}`}>💬</div>;
+const Trophy = ({ className }) => <div className={`w-6 h-6 ${className}`}>🏆</div>;
+const Users = ({ className }) => <div className={`w-6 h-6 ${className}`}>👥</div>;
+const Settings = ({ className }) => <div className={`w-6 h-6 ${className}`}>⚙️</div>;
+const Crown = ({ className }) => <div className={`w-6 h-6 ${className}`}>👑</div>;
+const LogOut = ({ className }) => <div className={`w-6 h-6 ${className}`}>🚪</div>;
+const Check = ({ className }) => <div className={`w-6 h-6 ${className}`}>✅</div>;
+const Building = ({ className }) => <div className={`w-6 h-6 ${className}`}>🏢</div>;
+const BookOpen = ({ className }) => <div className={`w-6 h-6 ${className}`}>📖</div>;
+const ShoppingCart = ({ className }) => <div className={`w-6 h-6 ${className}`}>🛒</div>;
+const Briefcase = ({ className }) => <div className={`w-6 h-6 ${className}`}>💼</div>;
+const Coins = ({ className }) => <div className={`w-6 h-6 ${className}`}>🪙</div>;
+const Award = ({ className }) => <div className={`w-6 h-6 ${className}`}>🏅</div>;
+const Star = ({ className }) => <div className={`w-6 h-6 ${className}`}>⭐</div>;
+
+// 🔥🔥🔥 NUCLEAR OPTION - HARDCODED URL 🔥🔥🔥
+const API = 'http://localhost:8030/api';
+
+// 🚨 AGGRESSIVE DEBUGGING - LINHA 13 🚨
+console.error('🔥🔥🔥 NUCLEAR DEBUG - APP.JS LINHA 13 🔥🔥🔥');
+console.error('🔥 API URL HARDCODED:', API);
+console.error('🔥 CONTAINS 8050?', API.includes('8050'));
+console.error('🔥 CONTAINS 8001?', API.includes('8001'));
+console.error('🔥 TIMESTAMP:', new Date().toISOString());
+console.error('🔥 LOCATION:', window.location.href);
+
+// 🚨 IMMEDIATE ALERT IF WRONG 🚨
+if (API.includes('8050') || API.includes('8001')) {
+  console.error('💥💥💥 WRONG PORT ERROR: API contains wrong port!');
+  console.error('💥 API should be 8030, but is:', API);
+  alert('💥 WRONG PORT ERROR: API=' + API + ' (should be 8030)');
+  debugger; // Force break in debugger
+  throw new Error('💥 API URL ERROR: ' + API);
+} else {
+  console.error('✅ SUCCESS: API is 8030');
+}
+
+// 🔥 OVERRIDE AXIOS DEFAULTS 🔥
+axios.defaults.baseURL = 'http://localhost:8030/api';
+console.error('🔥 AXIOS BASE URL SET TO:', axios.defaults.baseURL);
 
 // Auth Context
 const AuthContext = createContext();
@@ -816,21 +890,243 @@ const Dashboard = () => {
   );
 };
 
-const AdminPanel = () => (
-  <div className="min-h-screen bg-black">
-    <Navigation />
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-white mb-8">Painel de Administração</h1>
-      <Card className="bg-gray-900 border-copper/20">
-        <CardContent className="p-8 text-center">
-          <Crown className="h-12 w-12 text-copper mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-white mb-2">Admin Panel</h3>
-          <p className="text-gray-400">Painel para validação de respostas...</p>
-        </CardContent>
-      </Card>
+const AdminPanel = () => {
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [botFormData, setBotFormData] = useState({
+    username: '',
+    email: '',
+    bio: '',
+    pc_points: 0,
+    pcon_points: 0,
+    rank: 'Iniciante',
+    location: '',
+    skills: []
+  });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  if (!user || !user.is_admin) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+    
+    try {
+      console.error('🔥🔥🔥 WINDOWS DEBUG - ADMIN BOT SUBMIT 🔥🔥🔥');
+      console.error('🔥 API URL:', API);
+      console.error('🔥 RAW FORM DATA:', botFormData);
+      
+      // Clean and validate data
+      const cleanData = {
+        username: String(botFormData.username).trim(),
+        email: String(botFormData.email).trim(),
+        bio: String(botFormData.bio || '').trim(),
+        pc_points: parseInt(botFormData.pc_points) || 0,
+        pcon_points: parseInt(botFormData.pcon_points) || 0,
+        rank: String(botFormData.rank || 'Iniciante').trim(),
+        location: String(botFormData.location || '').trim(),
+        skills: Array.isArray(botFormData.skills) ? botFormData.skills : []
+      };
+      
+      console.error('🔥 CLEANED DATA:', cleanData);
+      console.error('🔥 JSON STRINGIFY:', JSON.stringify(cleanData));
+      
+      const token = localStorage.getItem('token');
+      console.error('🔥 TOKEN:', token ? 'EXISTS' : 'MISSING');
+      
+      const fullUrl = `${API}/admin/bots/`;
+      console.error('🔥 FULL URL:', fullUrl);
+      
+      const headers = { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      };
+      console.error('🔥 HEADERS:', headers);
+      
+      console.error('🔥 MAKING REQUEST...');
+      const response = await axios.post(fullUrl, cleanData, { headers });
+      
+      console.error('🔥 SUCCESS RESPONSE:', response);
+      console.error('🔥 SUCCESS DATA:', response.data);
+      setMessage('Bot criado com sucesso!');
+      setBotFormData({
+        username: '',
+        email: '',
+        bio: '',
+        pc_points: 0,
+        pcon_points: 0,
+        rank: 'Iniciante',
+        location: '',
+        skills: []
+      });
+    } catch (error) {
+      console.error('🔥 ERROR OBJECT:', error);
+      console.error('🔥 ERROR MESSAGE:', error.message);
+      console.error('🔥 ERROR RESPONSE:', error.response);
+      console.error('🔥 ERROR DATA:', error.response?.data);
+      console.error('🔥 ERROR STATUS:', error.response?.status);
+      console.error('🔥 ERROR HEADERS:', error.response?.headers);
+      
+      let errorMsg = 'Erro desconhecido';
+      if (error.response?.data?.detail) {
+        errorMsg = error.response.data.detail;
+      } else if (error.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+      
+      setMessage('Erro ao criar bot: ' + errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-black">
+      <Navigation />
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-white mb-8">Painel de Administração</h1>
+        
+        <div className="mb-6">
+          <div className="flex space-x-1 bg-gray-800 p-1 rounded-lg">
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'dashboard' 
+                  ? 'bg-copper text-black' 
+                  : 'text-gray-300 hover:text-white'
+              }`}
+            >
+              Dashboard
+            </button>
+            <button
+              onClick={() => setActiveTab('bots')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'bots'
+                  ? 'bg-copper text-black'
+                  : 'text-gray-300 hover:text-white'
+              }`}
+            >
+              Gerenciar Bots
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'dashboard' && (
+          <Card className="bg-gray-900 border-copper/20">
+            <CardContent className="p-8 text-center">
+              <Crown className="h-12 w-12 text-copper mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-white mb-2">Admin Dashboard</h3>
+              <p className="text-gray-400">Estatísticas e visão geral do sistema...</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {activeTab === 'bots' && (
+          <Card className="bg-gray-900 border-copper/20">
+            <CardHeader>
+              <CardTitle className="text-white">Criar Novo Bot</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
+                      Nome de usuário
+                    </label>
+                    <input
+                      type="text"
+                      id="username"
+                      value={botFormData.username}
+                      onChange={(e) => setBotFormData({...botFormData, username: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      value={botFormData.email}
+                      onChange={(e) => setBotFormData({...botFormData, email: e.target.value})}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white"
+                      required
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="bio" className="block text-sm font-medium text-gray-300 mb-1">
+                    Bio
+                  </label>
+                  <textarea
+                    id="bio"
+                    value={botFormData.bio}
+                    onChange={(e) => setBotFormData({...botFormData, bio: e.target.value})}
+                    className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="pc_points" className="block text-sm font-medium text-gray-300 mb-1">
+                      PC Points
+                    </label>
+                    <input
+                      type="number"
+                      id="pc_points"
+                      value={botFormData.pc_points}
+                      onChange={(e) => setBotFormData({...botFormData, pc_points: parseInt(e.target.value) || 0})}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="pcon_points" className="block text-sm font-medium text-gray-300 mb-1">
+                      PCon Points
+                    </label>
+                    <input
+                      type="number"
+                      id="pcon_points"
+                      value={botFormData.pcon_points}
+                      onChange={(e) => setBotFormData({...botFormData, pcon_points: parseInt(e.target.value) || 0})}
+                      className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white"
+                    />
+                  </div>
+                </div>
+
+                {message && (
+                  <div className={`text-sm text-center p-2 rounded ${
+                    message.includes('sucesso') ? 'text-green-400 bg-green-900/20' : 'text-red-400 bg-red-900/20'
+                  }`}>
+                    {message}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-copper hover:bg-copper/90 text-black font-medium py-2 px-4 rounded-md disabled:opacity-50"
+                >
+                  {loading ? 'Criando Bot...' : 'Criar Bot'}
+                </button>
+              </form>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Main App Component
 function App() {
