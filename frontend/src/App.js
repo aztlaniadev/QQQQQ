@@ -2,10 +2,11 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
-const API = process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:8001/api';
+// Force correct API URL
+const API = 'http://127.0.0.1:8001/api';
 
-// Debug: Log API URL
-console.log('API URL:', API, 'ENV:', process.env.NODE_ENV);
+// Debug: Log API URL  
+console.log('API URL:', API, 'ENV:', process.env.REACT_APP_BACKEND_URL);
 
 // Auth Context
 const AuthContext = createContext();

@@ -39,7 +39,43 @@ python main.py
 
 ### Autenticação
 - `POST /api/auth/login` - Login do usuário
+- `POST /api/auth/register` - Registro de novo usuário
 - `GET /api/auth/me` - Informações do usuário atual
+
+### Admin (Requer autenticação de admin)
+- `POST /api/admin/bots/` - Criar bot usuário
+- `GET /api/admin/stats` - Estatísticas do sistema
+- `GET /api/admin/answers/pending` - Respostas pendentes de validação
+
+## 🔑 Autenticação de Teste
+
+Para testar como admin, use qualquer email que contenha "admin":
+```bash
+# Login como admin
+curl -X POST "http://127.0.0.1:8001/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@teste.com", "password": "qualquersenha"}'
+
+# Login como usuário normal  
+curl -X POST "http://127.0.0.1:8001/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@teste.com", "password": "qualquersenha"}'
+```
+
+## 🤖 Exemplo de Criação de Bot
+
+```bash
+curl -X POST "http://127.0.0.1:8001/api/admin/bots/" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer admin-token" \
+  -d '{
+    "username": "meu_bot",
+    "email": "bot@exemplo.com",
+    "pc_points": 100,
+    "pcon_points": 50,
+    "bio": "Bot para teste"
+  }'
+```
 
 ## 🔧 Configuração
 

@@ -63,14 +63,26 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     """Get current user from token (simplified for demo)"""
     if not credentials:
         return None
+    
     # Simplified - in real app, decode JWT token
-    # For now, return a mock user
-    return {
-        "id": "mock-user-id",
-        "username": "test_user",
-        "email": "test@example.com",
-        "is_admin": False
-    }
+    # For now, return a mock admin user for testing
+    token = credentials.credentials
+    
+    # Mock different users based on token
+    if "admin" in token.lower():
+        return {
+            "id": "admin-user-id",
+            "username": "admin_user",
+            "email": "admin@example.com", 
+            "is_admin": True
+        }
+    else:
+        return {
+            "id": "mock-user-id",
+            "username": "test_user",
+            "email": "test@example.com",
+            "is_admin": False
+        }
 
 # Routes
 @app.get("/")
@@ -140,21 +152,59 @@ async def login(credentials: dict):
         if not email or not password:
             raise HTTPException(status_code=400, detail="Email e senha são obrigatórios")
         
-        # Mock authentication - replace with real authentication
+        # Mock authentication - return admin user for admin email
+        is_admin = "admin" in email.lower()
+        token = "admin-token" if is_admin else "user-token"
+        
         return {
-            "access_token": "mock-jwt-token",
+            "access_token": token,
             "token_type": "bearer",
             "user": {
-                "id": "user-1",
-                "username": "test_user",
+                "id": "admin-1" if is_admin else "user-1",
+                "username": "admin_user" if is_admin else "test_user",
                 "email": email,
-                "is_admin": False
+                "is_admin": is_admin,
+                "pc_points": 1000 if is_admin else 50,
+                "pcon_points": 500 if is_admin else 100,
+                "rank": "Especialista" if is_admin else "Iniciante"
             }
         }
     except HTTPException:
         raise
     except Exception as e:
         print(f"Error during login: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+@app.post("/api/auth/register")
+async def register(user_data: dict):
+    """User registration endpoint"""
+    try:
+        username = user_data.get("username")
+        email = user_data.get("email")
+        password = user_data.get("password")
+        
+        if not username or not email or not password:
+            raise HTTPException(status_code=400, detail="Username, email e senha são obrigatórios")
+        
+        # Mock registration
+        user_id = f"user-{hash(email) % 10000}"
+        
+        return {
+            "message": "Usuário criado com sucesso",
+            "user": {
+                "id": user_id,
+                "username": username,
+                "email": email,
+                "is_admin": False,
+                "pc_points": 0,
+                "pcon_points": 50,
+                "rank": "Iniciante"
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error during registration: {e}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 @app.get("/api/auth/me")
@@ -164,6 +214,98 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=401, detail="Token inválido")
     
     return current_user
+
+# Admin endpoints
+class BotCreateRequest(BaseModel):
+    username: str
+    email: str
+    pc_points: int = 0
+    pcon_points: int = 0
+    rank: str = "Iniciante"
+    bio: str = ""
+    location: str = ""
+    skills: List[str] = []
+
+@app.post("/api/admin/bots/")
+async def create_bot(bot_data: BotCreateRequest, current_user: dict = Depends(get_current_user)):
+    """Create a bot user (admin only)"""
+    try:
+        if not current_user or not current_user.get("is_admin"):
+            raise HTTPException(status_code=403, detail="Acesso negado - Admin necessário")
+        
+        # Create bot user - mock implementation
+        bot_id = f"bot-{bot_data.username}-{hash(bot_data.email) % 10000}"
+        
+        return {
+            "bot_id": bot_id,
+            "message": f"Bot {bot_data.username} criado com sucesso",
+            "bot": {
+                "id": bot_id,
+                "username": bot_data.username,
+                "email": bot_data.email,
+                "pc_points": bot_data.pc_points,
+                "pcon_points": bot_data.pcon_points,
+                "rank": bot_data.rank,
+                "bio": bot_data.bio,
+                "location": bot_data.location,
+                "skills": bot_data.skills,
+                "is_bot": True,
+                "created_at": "2024-08-15T18:00:00Z"
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error creating bot: {e}")
+        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+
+@app.get("/api/admin/stats")
+async def get_admin_stats(current_user: dict = Depends(get_current_user)):
+    """Get admin statistics"""
+    try:
+        if not current_user or not current_user.get("is_admin"):
+            raise HTTPException(status_code=403, detail="Acesso negado - Admin necessário")
+        
+        # Mock stats
+        return {
+            "total_users": 150,
+            "total_companies": 25,
+            "total_questions": 350,
+            "total_answers": 1250,
+            "pending_answers": 45,
+            "total_articles": 75,
+            "active_today": 35
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting admin stats: {e}")
+        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
+
+@app.get("/api/admin/answers/pending")
+async def get_pending_answers(current_user: dict = Depends(get_current_user)):
+    """Get pending answers for validation"""
+    try:
+        if not current_user or not current_user.get("is_admin"):
+            raise HTTPException(status_code=403, detail="Acesso negado - Admin necessário")
+        
+        # Mock pending answers
+        return [
+            {
+                "id": "answer-1",
+                "content": "Esta é uma resposta aguardando validação...",
+                "question_id": "question-1",
+                "question_title": "Como implementar JWT?",
+                "author_id": "user-1",
+                "author_username": "developer1",
+                "created_at": "2024-08-15T17:30:00Z"
+            }
+        ]
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting pending answers: {e}")
+        raise HTTPException(status_code=500, detail=f"Erro interno: {str(e)}")
 
 # Error handlers
 @app.exception_handler(Exception)
