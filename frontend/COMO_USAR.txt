@@ -1,0 +1,17 @@
+🤖 COMO CRIAR 5 BOTS AUTOMATICAMENTE 🤖
+
+✅ ARQUIVO CRIADO: CRIAR_5_BOTS_WINDOWS.bat
+
+🚀 COMO USAR:
+1. Certifique-se que o backend está rodando na porta 8030
+2. No terminal do Windows, digite: CRIAR_5_BOTS_WINDOWS.bat
+3. Aguarde os 5 bots serem criados automaticamente
+
+🤖 BOTS QUE SERÃO CRIADOS:
+1. CodeMaster_AI (Especialista) - Python, JavaScript, Java, C++, Docker
+2. WebDev_Expert (Avançado) - React, Node.js, TypeScript, MongoDB, AWS  
+3. DataScience_Bot (Mestre) - Python, R, TensorFlow, Pandas, SQL
+4. Mobile_Developer (Intermediário) - Flutter, React Native, Android, iOS
+5. DevOps_Guru (Guru) - Docker, Kubernetes, AWS, Azure, Jenkins
+
+✅ Depois acesse: http://localhost:3001/admin
