@@ -1,12 +1,37 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import { getApiUrl } from './config';
 
-// Force correct API URL
-const API = 'http://127.0.0.1:8001/api';
+// MULTIPLE LAYERS OF URL FORCING
+let API_URL_CANDIDATE = null;
 
-// Debug: Log API URL  
-console.log('API URL:', API, 'ENV:', process.env.REACT_APP_BACKEND_URL);
+try {
+  API_URL_CANDIDATE = getApiUrl();
+} catch (e) {
+  console.error('🔧 Config file failed, using fallback');
+  API_URL_CANDIDATE = 'http://127.0.0.1:8001/api';
+}
+
+// Use global variable as final fallback
+const API = window.FORCED_API_URL || API_URL_CANDIDATE || 'http://127.0.0.1:8001/api';
+
+// CRITICAL DEBUG INFORMATION
+console.error('🚨🚨🚨 CRITICAL DEBUG - APP.JS LOADED 🚨🚨🚨');
+console.error('🚨 GLOBAL API URL:', window.FORCED_API_URL);
+console.error('🚨 CONFIG API URL:', API_URL_CANDIDATE);
+console.error('🚨 FINAL API URL BEING USED:', API);
+console.error('🚨 TIMESTAMP:', new Date().toISOString());
+
+// ULTRA SAFETY CHECK
+if (API.includes('8050')) {
+  console.error('❌❌❌ CRITICAL ERROR: API contains 8050!');
+  console.error('❌❌❌ This should be IMPOSSIBLE now!');
+  alert('CRITICAL ERROR: Wrong API URL detected! API=' + API);
+  throw new Error('API URL is incorrect - contains 8050: ' + API);
+} else {
+  console.error('✅✅✅ SUCCESS: API URL is correct (8001)');
+}
 
 // Auth Context
 const AuthContext = createContext();
