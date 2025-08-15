@@ -10,18 +10,27 @@
       content="Acode Lab - Plataforma global para desenvolvedores"
     />
     
-    <!-- FORCE CORRECT API URL GLOBALLY -->
+    <!-- FORCE CORRECT API URL GLOBALLY - CACHE BUSTER -->
     <script>
-      console.error('🌐 GLOBAL SCRIPT LOADED - FORCING CORRECT API URL');
-      window.FORCED_API_URL = 'http://127.0.0.1:8001/api';
-      console.error('🌐 GLOBAL API URL SET TO:', window.FORCED_API_URL);
+      // 🔥 CACHE BUSTER - TIMESTAMP: 2025-08-15-19:00:00
+      console.error('🔥🔥🔥 CACHE BUSTER LOADED - TIMESTAMP: 2025-08-15-19:00:00 🔥🔥🔥');
       
-      // Override any potential React environment variables
+      // NUCLEAR OPTION - FORCE URL
+      window.FORCED_API_URL = 'http://127.0.0.1:8001/api';
+      console.error('🔥 NUCLEAR API URL SET TO:', window.FORCED_API_URL);
+      
+      // Override React environment
       window.process = window.process || {};
       window.process.env = window.process.env || {};
       window.process.env.REACT_APP_BACKEND_URL = 'http://127.0.0.1:8001/api';
       
-      console.error('🌐 OVERRODE REACT_APP_BACKEND_URL TO:', window.process.env.REACT_APP_BACKEND_URL);
+      // IMMEDIATE CHECK
+      if (window.FORCED_API_URL.includes('8050')) {
+        alert('💥 CRITICAL ERROR IN INDEX.HTML: ' + window.FORCED_API_URL);
+        throw new Error('💥 INDEX.HTML API ERROR');
+      }
+      
+      console.error('🔥 INDEX.HTML: API URL IS CORRECT (8001)');
     </script>
     
     <title>Acode Lab</title>

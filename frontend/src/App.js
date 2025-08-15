@@ -1,37 +1,31 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { getApiUrl } from './config';
 
-// MULTIPLE LAYERS OF URL FORCING
-let API_URL_CANDIDATE = null;
+// 🔥🔥🔥 NUCLEAR OPTION - HARDCODED URL 🔥🔥🔥
+const API = 'http://127.0.0.1:8001/api';
 
-try {
-  API_URL_CANDIDATE = getApiUrl();
-} catch (e) {
-  console.error('🔧 Config file failed, using fallback');
-  API_URL_CANDIDATE = 'http://127.0.0.1:8001/api';
-}
+// 🚨 AGGRESSIVE DEBUGGING - LINHA 13 🚨
+console.error('🔥🔥🔥 NUCLEAR DEBUG - APP.JS LINHA 13 🔥🔥🔥');
+console.error('🔥 API URL HARDCODED:', API);
+console.error('🔥 CONTAINS 8050?', API.includes('8050'));
+console.error('🔥 CONTAINS 8001?', API.includes('8001'));
+console.error('🔥 TIMESTAMP:', new Date().toISOString());
+console.error('🔥 LOCATION:', window.location.href);
 
-// Use global variable as final fallback
-const API = window.FORCED_API_URL || API_URL_CANDIDATE || 'http://127.0.0.1:8001/api';
-
-// CRITICAL DEBUG INFORMATION
-console.error('🚨🚨🚨 CRITICAL DEBUG - APP.JS LOADED 🚨🚨🚨');
-console.error('🚨 GLOBAL API URL:', window.FORCED_API_URL);
-console.error('🚨 CONFIG API URL:', API_URL_CANDIDATE);
-console.error('🚨 FINAL API URL BEING USED:', API);
-console.error('🚨 TIMESTAMP:', new Date().toISOString());
-
-// ULTRA SAFETY CHECK
+// 🚨 IMMEDIATE ALERT IF WRONG 🚨
 if (API.includes('8050')) {
-  console.error('❌❌❌ CRITICAL ERROR: API contains 8050!');
-  console.error('❌❌❌ This should be IMPOSSIBLE now!');
-  alert('CRITICAL ERROR: Wrong API URL detected! API=' + API);
-  throw new Error('API URL is incorrect - contains 8050: ' + API);
+  console.error('💥💥💥 IMPOSSIBLE ERROR: API contains 8050!');
+  alert('💥 IMPOSSIBLE ERROR: API=' + API);
+  debugger; // Force break in debugger
+  throw new Error('💥 API URL ERROR: ' + API);
 } else {
-  console.error('✅✅✅ SUCCESS: API URL is correct (8001)');
+  console.error('✅ SUCCESS: API is 8001');
 }
+
+// 🔥 OVERRIDE AXIOS DEFAULTS 🔥
+axios.defaults.baseURL = 'http://127.0.0.1:8001/api';
+console.error('🔥 AXIOS BASE URL SET TO:', axios.defaults.baseURL);
 
 // Auth Context
 const AuthContext = createContext();
