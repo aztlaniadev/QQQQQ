@@ -2,7 +2,7 @@
 Configuration settings for Acode Lab Backend
 """
 import os
-from typing import List, Optional
+from typing import List, Optional, Dict
 from pydantic_settings import BaseSettings
 
 
@@ -62,18 +62,23 @@ class Settings(BaseSettings):
         "profile_completed": 10
     }
     
-    pcon_points_config: dict = {
-        "question_solved": 2,
-        "answer_accepted": 5,
-        "achievement_unlocked": 10
+    pcon_points_config: Dict[str, int] = {
+        "question_created": 2,
+        "answer_created": 5,
+        "answer_accepted": 15,
+        "received_upvote": 1,
+        "received_downvote": 0,
+        "daily_login": 1,
+        "profile_completed": 5
     }
     
-    ranks_config: dict = {
-        0: "Iniciante",
-        100: "Desenvolvedor",
-        500: "Especialista", 
-        2000: "Mestre",
-        5000: "Guru"
+    rank_config: Dict[str, Dict[str, int]] = {
+        "Iniciante": {"pc_points": 0, "pcon_points": 0},
+        "Colaborador": {"pc_points": 50, "pcon_points": 25},
+        "Especialista": {"pc_points": 150, "pcon_points": 75},
+        "Veterano": {"pc_points": 300, "pcon_points": 150},
+        "Mestre": {"pc_points": 600, "pcon_points": 300},
+        "Lenda": {"pc_points": 1200, "pcon_points": 600}
     }
     
     class Config:

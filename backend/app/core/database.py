@@ -98,6 +98,56 @@ class Database:
             await self.database.companies.create_index([("name", ASCENDING)])
             await self.database.companies.create_index([("created_at", DESCENDING)])
             
+            # Advanced Gamification indexes
+            
+            # Badges collection indexes
+            await self.database.badges.create_index([("badge_type", ASCENDING)])
+            await self.database.badges.create_index([("is_rare", ASCENDING)])
+            await self.database.badges.create_index([("sort_order", ASCENDING)])
+            
+            # User badges collection indexes
+            await self.database.user_badges.create_index([("user_id", ASCENDING)])
+            await self.database.user_badges.create_index([("badge_id", ASCENDING)])
+            await self.database.user_badges.create_index([
+                ("user_id", ASCENDING), 
+                ("badge_id", ASCENDING)
+            ], unique=True)
+            await self.database.user_badges.create_index([("is_featured", ASCENDING)])
+            await self.database.user_badges.create_index([("earned_at", DESCENDING)])
+            
+            # Streaks collection indexes
+            await self.database.streaks.create_index([("user_id", ASCENDING)])
+            await self.database.streaks.create_index([("streak_type", ASCENDING)])
+            await self.database.streaks.create_index([
+                ("user_id", ASCENDING), 
+                ("streak_type", ASCENDING)
+            ], unique=True)
+            await self.database.streaks.create_index([("is_active", ASCENDING)])
+            await self.database.streaks.create_index([("current_count", DESCENDING)])
+            await self.database.streaks.create_index([("best_count", DESCENDING)])
+            
+            # User achievements enhanced indexes  
+            await self.database.user_achievements.create_index([("user_id", ASCENDING)])
+            await self.database.user_achievements.create_index([("achievement_id", ASCENDING)])
+            await self.database.user_achievements.create_index([
+                ("user_id", ASCENDING), 
+                ("achievement_id", ASCENDING)
+            ], unique=True)
+            await self.database.user_achievements.create_index([("is_earned", ASCENDING)])
+            await self.database.user_achievements.create_index([("earned_at", DESCENDING)])
+            
+            # Leaderboards collection indexes
+            await self.database.leaderboards.create_index([("leaderboard_type", ASCENDING)])
+            await self.database.leaderboards.create_index([("period_start", ASCENDING)])
+            await self.database.leaderboards.create_index([("period_end", ASCENDING)])
+            await self.database.leaderboards.create_index([("last_updated", DESCENDING)])
+            
+            # Referrals collection indexes
+            await self.database.referrals.create_index([("referrer_id", ASCENDING)])
+            await self.database.referrals.create_index([("referred_id", ASCENDING)], unique=True)
+            await self.database.referrals.create_index([("milestone", ASCENDING)])
+            await self.database.referrals.create_index([("created_at", DESCENDING)])
+            
             logger.info("Database indexes created successfully")
             
         except Exception as e:
@@ -131,14 +181,47 @@ def get_votes_collection():
     """Get votes collection"""
     return database.database.votes
 
-def get_achievements_collection():
-    """Get achievements collection"""
-    return database.database.achievements
 
 def get_points_history_collection():
     """Get points history collection"""
     return database.database.points_history
 
+
+def get_achievements_collection():
+    """Get achievements collection"""
+    return database.database.achievements
+
 def get_companies_collection():
     """Get companies collection"""
     return database.database.companies
+
+
+# Advanced Gamification Collections
+def get_badges_collection():
+    """Get badges collection"""
+    return database.database.badges
+
+
+def get_user_badges_collection():
+    """Get user badges collection"""
+    return database.database.user_badges
+
+
+def get_streaks_collection():
+    """Get streaks collection"""
+    return database.database.streaks
+
+
+def get_user_achievements_collection():
+    """Get user achievements collection"""
+    return database.database.user_achievements
+
+
+def get_leaderboards_collection():
+    """Get leaderboards collection"""
+    return database.database.leaderboards
+
+
+def get_referrals_collection():
+    """Get referrals collection"""
+    return database.database.referrals

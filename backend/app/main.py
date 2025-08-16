@@ -14,7 +14,7 @@ import time
 from .core.config import settings
 from .core.database import database
 from .models.base import ErrorResponse, HealthResponse
-from .routers import auth
+from .routers import auth, questions, answers, votes, advanced_gamification, admin_gamification
 
 
 # Configure logging
@@ -84,7 +84,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         content=ErrorResponse(
             error=exc.detail,
             detail=getattr(exc, 'detail', None)
-        ).dict()
+        ).model_dump()
     )
 
 
@@ -96,7 +96,7 @@ async def general_exception_handler(request: Request, exc: Exception):
         content=ErrorResponse(
             error="Internal server error",
             detail="An unexpected error occurred"
-        ).dict()
+        ).model_dump()
     )
 
 
@@ -142,6 +142,36 @@ app.include_router(
     auth.router,
     prefix=f"{settings.api_prefix}/auth",
     tags=["Authentication"]
+)
+
+app.include_router(
+    questions.router,
+    prefix=f"{settings.api_prefix}/questions",
+    tags=["Questions"]
+)
+
+app.include_router(
+    answers.router,
+    prefix=f"{settings.api_prefix}/answers",
+    tags=["Answers"]
+)
+
+app.include_router(
+    votes.router,
+    prefix=f"{settings.api_prefix}/votes",
+    tags=["Votes"]
+)
+
+app.include_router(
+    advanced_gamification.router,
+    prefix=f"{settings.api_prefix}/gamification",
+    tags=["Advanced Gamification"]
+)
+
+app.include_router(
+    admin_gamification.router,
+    prefix=f"{settings.api_prefix}/admin/gamification",
+    tags=["Admin Gamification"]
 )
 
 
