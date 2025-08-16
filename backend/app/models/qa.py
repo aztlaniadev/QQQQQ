@@ -13,7 +13,7 @@ class QuestionCreate(BaseModel):
     content: str = Field(..., min_length=20, max_length=10000)
     tags: List[str] = Field(..., min_items=1, max_items=5)
     category: Optional[str] = Field(None, max_length=50)
-    difficulty: Optional[str] = Field(None, regex=r'^(beginner|intermediate|advanced|expert)$')
+    difficulty: Optional[str] = Field(None, pattern=r'^(beginner|intermediate|advanced|expert)$')
     
     @validator('tags')
     def validate_tags(cls, v):
@@ -38,7 +38,7 @@ class QuestionUpdate(BaseModel):
     content: Optional[str] = Field(None, min_length=20, max_length=10000)
     tags: Optional[List[str]] = Field(None, min_items=1, max_items=5)
     category: Optional[str] = Field(None, max_length=50)
-    difficulty: Optional[str] = Field(None, regex=r'^(beginner|intermediate|advanced|expert)$')
+    difficulty: Optional[str] = Field(None, pattern=r'^(beginner|intermediate|advanced|expert)$')
     
     @validator('tags')
     def validate_tags(cls, v):
@@ -131,8 +131,8 @@ class AnswerResponse(BaseModel):
 class VoteCreate(BaseModel):
     """Vote creation model"""
     target_id: str
-    target_type: str = Field(..., regex=r'^(question|answer)$')
-    vote_type: str = Field(..., regex=r'^(upvote|downvote|up|down)$')
+    target_type: str = Field(..., pattern=r'^(question|answer)$')
+    vote_type: str = Field(..., pattern=r'^(upvote|downvote|up|down)$')
     
     @validator('vote_type')
     def normalize_vote_type(cls, v):
@@ -227,11 +227,11 @@ class SearchQuery(BaseModel):
     q: Optional[str] = Field(None, max_length=200)  # Search text
     tags: Optional[List[str]] = Field(None, max_items=5)
     category: Optional[str] = Field(None, max_length=50)
-    difficulty: Optional[str] = Field(None, regex=r'^(beginner|intermediate|advanced|expert)$')
+    difficulty: Optional[str] = Field(None, pattern=r'^(beginner|intermediate|advanced|expert)$')
     solved: Optional[bool] = None
     author: Optional[str] = Field(None, max_length=50)
-    sort_by: str = Field("created_at", regex=r'^(created_at|updated_at|views|score|answers_count)$')
-    sort_order: str = Field("desc", regex=r'^(asc|desc)$')
+    sort_by: str = Field("created_at", pattern=r'^(created_at|updated_at|views|score|answers_count)$')
+    sort_order: str = Field("desc", pattern=r'^(asc|desc)$')
     skip: int = Field(0, ge=0)
     limit: int = Field(20, ge=1, le=100)
 

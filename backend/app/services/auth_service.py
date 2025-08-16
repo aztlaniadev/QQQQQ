@@ -25,7 +25,14 @@ class AuthService:
     """Authentication service class"""
     
     def __init__(self):
-        self.users_collection = get_users_collection()
+        self._users_collection = None
+    
+    @property
+    def users_collection(self):
+        """Lazy load users collection"""
+        if self._users_collection is None:
+            self._users_collection = get_users_collection()
+        return self._users_collection
     
     async def register_user(self, user_data: UserCreate) -> TokenResponse:
         """Register a new user"""

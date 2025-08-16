@@ -22,10 +22,38 @@ class UserService:
     """User service class"""
     
     def __init__(self):
-        self.users_collection = get_users_collection()
-        self.questions_collection = get_questions_collection()
-        self.answers_collection = get_answers_collection()
-        self.votes_collection = get_votes_collection()
+        self._users_collection = None
+        self._questions_collection = None
+        self._answers_collection = None
+        self._votes_collection = None
+    
+    @property
+    def users_collection(self):
+        """Lazy load users collection"""
+        if self._users_collection is None:
+            self._users_collection = get_users_collection()
+        return self._users_collection
+    
+    @property
+    def questions_collection(self):
+        """Lazy load questions collection"""
+        if self._questions_collection is None:
+            self._questions_collection = get_questions_collection()
+        return self._questions_collection
+    
+    @property
+    def answers_collection(self):
+        """Lazy load answers collection"""
+        if self._answers_collection is None:
+            self._answers_collection = get_answers_collection()
+        return self._answers_collection
+    
+    @property
+    def votes_collection(self):
+        """Lazy load votes collection"""
+        if self._votes_collection is None:
+            self._votes_collection = get_votes_collection()
+        return self._votes_collection
     
     async def update_user_profile(self, user_id: str, update_data: UserUpdate) -> UserResponse:
         """Update user profile"""

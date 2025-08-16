@@ -45,7 +45,7 @@ class UserUpdate(BaseModel):
     github: Optional[str] = Field(None, max_length=100)
     linkedin: Optional[str] = Field(None, max_length=100)
     skills: Optional[List[str]] = Field(None, max_items=20)
-    theme_color: Optional[str] = Field(None, regex=r'^#[0-9A-Fa-f]{6}$')
+    theme_color: Optional[str] = Field(None, pattern=r'^#[0-9A-Fa-f]{6}$')
     custom_title: Optional[str] = Field(None, max_length=100)
     banner_image: Optional[str] = Field(None, max_length=500)
     
@@ -115,7 +115,7 @@ class CompanyCreate(BaseModel):
     password: str = Field(..., min_length=8, max_length=100)
     website: Optional[str] = Field(None, max_length=200)
     description: Optional[str] = Field(None, max_length=1000)
-    size: Optional[str] = Field(None, regex=r'^(1-10|11-50|51-200|201-1000|1000\+)$')
+    size: Optional[str] = Field(None, pattern=r'^(1-10|11-50|51-200|201-1000|1000\+)$')
     industry: Optional[str] = Field(None, max_length=100)
 
 
@@ -124,7 +124,7 @@ class CompanyUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=2, max_length=100)
     description: Optional[str] = Field(None, max_length=1000)
     website: Optional[str] = Field(None, max_length=200)
-    size: Optional[str] = Field(None, regex=r'^(1-10|11-50|51-200|201-1000|1000\+)$')
+    size: Optional[str] = Field(None, pattern=r'^(1-10|11-50|51-200|201-1000|1000\+)$')
     industry: Optional[str] = Field(None, max_length=100)
     logo_url: Optional[str] = Field(None, max_length=500)
 
@@ -149,7 +149,7 @@ class CompanyResponse(BaseModel):
 
 class UserModerationAction(BaseModel):
     """User moderation action model"""
-    action: str = Field(..., regex=r'^(ban|unban|mute|unmute|silence|unsilence)$')
+    action: str = Field(..., pattern=r'^(ban|unban|mute|unmute|silence|unsilence)$')
     reason: Optional[str] = Field(None, max_length=500)
     duration_hours: Optional[int] = Field(None, ge=1, le=8760)  # Max 1 year
 

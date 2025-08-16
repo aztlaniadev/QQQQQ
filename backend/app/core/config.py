@@ -3,7 +3,7 @@ Configuration settings for Acode Lab Backend
 """
 import os
 from typing import List, Optional
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 7
     
     # CORS
-    cors_origins: List[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    cors_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
     
     # API Configuration
     api_prefix: str = "/api"
@@ -79,6 +79,11 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+    
+    @property
+    def cors_origins_list(self) -> List[str]:
+        """Convert CORS origins string to list"""
+        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
 
 
 # Global settings instance
